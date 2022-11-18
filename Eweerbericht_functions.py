@@ -150,7 +150,7 @@ def make_figure(mean,prices,pricesincl, date):
     if min(prices)>0:
         fig.update_yaxes(rangemode="tozero")
 
-    filename = 'figs/prijscurve '+dd.strftime('%d%m%Y')+'.jpg'
+    filename = 'figs/prijscurve '+ date
 
     return fig, filename
 
