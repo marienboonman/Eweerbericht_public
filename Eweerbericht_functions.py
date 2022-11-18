@@ -128,7 +128,7 @@ def get_prices():
     mean = prices-prices+mean
     return tweet, mean, prices, pricesincl
 
-def make_figure(mean,prices,pricesincl):
+def make_figure(mean,prices,pricesincl, date):
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         name="Kaal",
@@ -143,7 +143,7 @@ def make_figure(mean,prices,pricesincl):
         mode="lines", x=pricesincl.index, y=mean,
         line = {"shape":"hv"}))
     fig.update_layout(
-        title="Elektriciteitsprijs (€/kWh) "+ dd.strftime("%d-%m-%Y"),
+        title="Elektriciteitsprijs (€/kWh) "+ date,
         xaxis_title="Tijd")
     fig.update_xaxes(dtick = 2, tickangle = 45)
 
