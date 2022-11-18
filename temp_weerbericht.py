@@ -10,16 +10,16 @@ import os
 
 def makehourindex(intg, delta):
     if intg == 24:
-        hr = datetime.time(0) 
+        hr = datetime.time(0)
     else:
         hr = datetime.time(intg)
-    
-    
+
+
     if intg +delta == 24:
         hr1 =datetime.time(0)
     else:
         hr1 = datetime.time(intg+delta)
-    
+
     if delta >= 0:
         return '{}-{}'.format(hr.strftime(format = '%H:%M'),hr1.strftime(format = '%H:%M'))
     else:
@@ -62,14 +62,14 @@ goedkoopste = '{}: {}'.format(time,goedkoopsteuur)
 s = pd.Series(index = pricesincl.index, dtype = float)
 
 for i in range(1,len(s.index)):
-  s.iloc[i] = pricesincl.iloc[i-1:i+1].mean()  
+  s.iloc[i] = pricesincl.iloc[i-1:i+1].mean()
 
 s = s.drop('00:00-01:00')
 
 lst = []
 for i in range(2,25):
     lst.append(makehourindex(i,-2))
-    
+
 s.index = lst
 
 ochtend = s[range(1,8)].sort_values()
@@ -92,14 +92,14 @@ stravond = '{}: €{}'.format(time,prijsavond)
 s = pd.Series(index = pricesincl.index, dtype = float)
 
 for i in range(2,len(s.index)):
-  s.iloc[i] = pricesincl.iloc[i-2:i+1].mean()  
+  s.iloc[i] = pricesincl.iloc[i-2:i+1].mean()
 
 s = s.drop(['00:00-01:00','01:00-02:00'])
 
 lst = []
 for i in range(3,25):
     lst.append(makehourindex(i,-3))
-    
+
 s.index = lst
 
 dag = s.sort_values()
@@ -107,7 +107,7 @@ dag = s.sort_values()
 time = dag.index[0]
 prijsdag = round(dag[time],3)
 strdag = '{}: €{}'.format(time,prijsdag)
-    
+
 tweet = "Prijscurve voor morgen!\nDuurste uur:\n{}\nGoedkoopste uur:\n{}\nGoedkoopste aaneengesloten uren:\n\
 hele dag:   {}\n\'s Morgens: {}\n\'s Middags: {}\n\'s Avonds:  {}" \
         .format(duurste,goedkoopste,strdag,strochtend,strmiddag,stravond)
@@ -147,7 +147,7 @@ fig.update_xaxes(dtick = 2, tickangle = 45)
 if min(prices)>0:
     fig.update_yaxes(rangemode="tozero")
 
-filename = '/home/marien/Documents/Eweerbericht_public/figs/prijscurve '+dd.strftime('%d%m%Y')+'.jpg'
+filename = 'prijscurve_'+dd.strftime('%d%m%Y')+'.png'
 
 fig.write_image(filename)
 
