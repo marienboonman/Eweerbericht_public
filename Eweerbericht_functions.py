@@ -126,7 +126,7 @@ def get_prices():
     except:
         mean = pd.Series(table[table.columns[1]]).str.strip('€').str.replace(',','.').astype(float).mean()
     mean = prices-prices+mean
-return tweet, mean, prices, pricesincl
+    return tweet, mean, prices, pricesincl
 
 def make_figure(mean,prices,pricesincl):
     fig = go.Figure()
