@@ -147,7 +147,7 @@ fig.update_xaxes(dtick = 2, tickangle = 45)
 if min(prices)>0:
     fig.update_yaxes(rangemode="tozero")
 
-filename = 'figs/prijscurve '+dd.strftime('%d%m%Y')+'.jpg'
+filename = '/home/marien/Documents/Eweerbericht_public/figs/prijscurve '+dd.strftime('%d%m%Y')+'.jpg'
 
 fig.write_image(filename)
 
