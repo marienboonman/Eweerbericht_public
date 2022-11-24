@@ -18,7 +18,12 @@ pricesincl = round((prices+0.03679+0.0305)*1.09,4)
 
 # forecast van hernieuwbare opwek ophalen
 renewableforecast = get.renewable_forecast_api()
+
+# forecast van totale elektriciteitsvraag
 loadforecast = get.load_forecast_api()
+# loadforecast repareren omdat deze een series van arrays teruggeeft
+for i in loadforecast.index:
+    loadforecast.loc[i] = loadforecast.loc[i][0]
 
 #prijs van het modelcontract ophalen
 url = 'https://www.overstappen.nl/energie/energietarieven/#Overzicht_energietarieven_2022'
@@ -146,7 +151,7 @@ fig.update_layout(
 fig.update_xaxes(dtick = 2, tickangle = 45)
 fig.update_yaxes(rangemode="tozero")
 
-fig.update_layout(yaxis_range=[0, max(max(loadforecast.values[0]),max(renewableforecast.sum(axis=1)))])
+fig.update_layout(yaxis_range=[0, max(max(loadforecast),max(renewableforecast.sum(axis=1)))])
 
 filename = 'forecast_'+delivery_date.strftime('%d%m%Y')+'.png'
 
