@@ -4,27 +4,28 @@ import keys as tokens
 import tweepy
 import plotly.graph_objects as go
 import plotly.io as pio
+from plotly.subplots import make_subplots
 pio.renderers.default='browser'
 import kaleido
 import os
 import get_data as get
 
-delivery_date = datetime.date.today()+datetime.timedelta(days=1)
+delivery_date = datetime.date.today()+datetime.timedelta(days=-100)
+
 ## DATA OPHALEN
 
 # Day ahead prijzen van de ENTSOE API halen en NL belasting toepassen
-prices = get.prices_api()
+prices = get.prices_api(delivery_date = delivery_date)/1000
 pricesincl = round((prices+0.03679+0.0305)*1.09,4)
 
 # forecast van hernieuwbare opwek ophalen
-renewableforecast = get.renewable_forecast_api()
+renewableforecast = get.renewable_forecast_api(delivery_date = delivery_date)
 
 # forecast van totale elektriciteitsvraag
-loadforecast = get.load_forecast_api()
-# loadforecast repareren omdat deze een series van arrays teruggeeft
-for i in loadforecast.index:
-    loadforecast.loc[i] = loadforecast.loc[i][0]
-
+l = get.load_forecast_api(delivery_date = delivery_date)
+loadforecast = pd.Series(index = l.index, dtype = float)
+for i in l.index:
+    loadforecast[i] = l.loc[i]
 #prijs van het modelcontract ophalen
 url = 'https://www.overstappen.nl/energie/energietarieven/#Overzicht_energietarieven_2022'
 table = pd.read_html(url)[0]
@@ -132,7 +133,7 @@ fig = go.Figure()
 fig.add_trace(go.Scatter(
     name="Totale vraag",
     mode="lines", x=loadforecast.index, y=loadforecast,
-    line = {"shape":"hv"}))
+    line = {"shape":"spline", 'smoothing':1.3}))
 fig.add_trace(go.Scatter(
     name="Wind op zee",
     x=renewableforecast.index, y=renewableforecast['Wind Offshore'],
@@ -151,8 +152,6 @@ fig.update_layout(
 fig.update_xaxes(dtick = 2, tickangle = 45)
 fig.update_yaxes(rangemode="tozero")
 
-fig.update_layout(yaxis_range=[0, max(max(loadforecast),max(renewableforecast.sum(axis=1)))])
-
 filename = 'forecast_'+delivery_date.strftime('%d%m%Y')+'.png'
 
 fig.write_image(filename)
@@ -161,6 +160,42 @@ media = api.media_upload(filename)
 imgs.append(media.media_id_string)
 os.remove(filename)
 
+
+# Create figure with secondary y-axis
+fig = make_subplots(specs=[[{"secondary_y": True}]])
+fig.add_trace(go.Scatter(
+    name="Restlast",
+    mode="lines", x=loadforecast.index, y=loadforecast - renewableforecast.sum(axis = 1) ,
+    line = {"shape":"spline", 'smoothing':1.3}), secondary_y = True)
+fig.add_trace(go.Scatter(
+    name="All-in prijs",
+    mode="lines", x=pricesincl.index, y=pricesincl,
+    line = {"shape":"hv"}), secondary_y = False)
+'''
+fig.add_trace(go.Scatter(
+    name="Modelcontract",
+    mode="lines", x=pricesincl.index, y=mean,
+    line = {"shape":"hv"}))
+'''
+fig.update_layout(
+    title="Elektriciteitsprijs (€/kWh) en restlast (MW) "+ delivery_date.strftime("%d-%m-%Y"),
+    xaxis_title="Tijd")
+fig.update_xaxes(dtick = 8, tickangle = 45)
+fig.update_yaxes(title_text="Prijs (€/kWh)", secondary_y=False)
+fig.update_yaxes(title_text="Restlast (MW)", secondary_y=True)
+
+##TODO ALIGN Y AXES
+if min(prices)>0 and min(loadforecast - renewableforecast.sum(axis = 1))>0:
+    fig.update_yaxes(rangemode="tozero", secondary_y = True)
+    fig.update_yaxes(rangemode="tozero", secondary_y = False)
+
+filename = 'residualload_'+delivery_date.strftime('%d%m%Y')+'.png'
+
+fig.write_image(filename)
+
+media = api.media_upload(filename)
+imgs.append(media.media_id_string)
+os.remove(filename)
 
 client = tweepy.Client(consumer_key=tokens.APIKey,
                        consumer_secret=tokens.APISecret,

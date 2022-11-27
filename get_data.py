@@ -23,7 +23,6 @@ def makehourindex(intg, delta):
 
 
 def prices_api(country = 'NL', delivery_date = datetime.date.today()+datetime.timedelta(days = 1)):
-    trading_date = delivery_date - datetime.timedelta(days = 1)   
     client = EntsoePandasClient(api_key=keys.entsoe_api_key)
     
     start = pd.Timestamp(delivery_date, tz='Europe/Brussels')
@@ -34,7 +33,6 @@ def prices_api(country = 'NL', delivery_date = datetime.date.today()+datetime.ti
     return prices
 
 def renewable_forecast_api(country = 'NL', delivery_date = datetime.date.today()+datetime.timedelta(days = 1)):
-    trading_date = delivery_date - datetime.timedelta(days = 1)
     client = EntsoePandasClient(api_key=keys.entsoe_api_key)
     
     start = pd.Timestamp(delivery_date, tz='Europe/Brussels')
@@ -42,11 +40,10 @@ def renewable_forecast_api(country = 'NL', delivery_date = datetime.date.today()
     
     forecast = client.query_wind_and_solar_forecast(country, start = start, end = end)
     forecast.name = 'Generation forecast, {}'.format(delivery_date)
-    return forecast.resample('H').mean()
+    return forecast #.resample('H').mean()
     
 
 def load_forecast_api(country = 'NL', delivery_date = datetime.date.today()+datetime.timedelta(days = 1)):
-    trading_date = delivery_date - datetime.timedelta(days = 1)
     client = EntsoePandasClient(api_key=keys.entsoe_api_key)
     
     start = pd.Timestamp(delivery_date, tz='Europe/Brussels')
@@ -54,7 +51,7 @@ def load_forecast_api(country = 'NL', delivery_date = datetime.date.today()+date
     
     forecast = client.query_load_forecast(country, start = start, end = end)
     forecast.name = 'Generation forecast, {}'.format(delivery_date)
-    return forecast.resample('H').mean()
+    return forecast #.resample('H').mean()
 
 def prices_web(country = 'NL', delivery_date = datetime.date.today()+datetime.timedelta(days = 1)):
     base_url = 'https://www.epexspot.com/en/market-data?market_area={}&trading_date={}&delivery_date={}&underlying_year=&modality=Auction&sub_modality=DayAhead&technology=&product=60&data_mode=table&period=&production_period='
