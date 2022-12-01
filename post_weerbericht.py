@@ -9,6 +9,28 @@ pio.renderers.default='browser'
 import kaleido
 import os
 import get_data as get
+import sys
+
+path = ''
+if 'win' in sys.platform:
+    try:
+        p = os.path.abspath(__file__).split('\\')
+        path = '{}/'.format('/'.join(p[0:len(p)-1]))
+        print('windows '+path)
+        os.chdir(path)
+    except:
+        print('running from spyder, working folder is {}'.format(os.getcwd()))
+
+
+if 'linux' in sys.platform:
+    try:
+        p = os.path.abspath(__file__).split('/')
+        path = '{}/'.format('/'.join(p[0:len(p)-1]))
+        print('linux '+path)
+        os.chdir(path)
+    except:
+        print('running from spyder, working folder is {}'.format(os.getcwd()))
+
 
 delivery_date = datetime.date.today()+datetime.timedelta(days = 1)
 
@@ -164,14 +186,14 @@ fig.update_xaxes(dtick = 8, tickangle = 45)
 fig.update_yaxes(rangemode="tozero")
 
 
-filename = 'forecast_'+delivery_date.strftime('%d%m%Y')+'.png'
+filename = 'figs/forecast_'+delivery_date.strftime('%d%m%Y')+'.png'
 
 
 fig.write_image(filename)
 
 media = api.media_upload(filename)
 imgs.append(media.media_id_string)
-os.remove(filename)
+#os.remove(filename)
 
 
 # Create figure with secondary y-axis
