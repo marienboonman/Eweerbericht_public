@@ -10,7 +10,7 @@ import kaleido
 import os
 import get_data as get
 
-delivery_date = datetime.date.today()+datetime.timedelta(days=-100)
+delivery_date = datetime.date.today()+datetime.timedelta(days = 1)
 
 ## DATA OPHALEN
 
@@ -26,6 +26,13 @@ l = get.load_forecast_api(delivery_date = delivery_date)
 loadforecast = pd.Series(index = l.index, dtype = float)
 for i in l.index:
     loadforecast[i] = l.loc[i]
+    
+
+loadforecast = loadforecast/1000
+renewableforecast = renewableforecast/1000
+restlast = loadforecast - renewableforecast.sum(axis = 1)
+
+
 #prijs van het modelcontract ophalen
 url = 'https://www.overstappen.nl/energie/energietarieven/#Overzicht_energietarieven_2022'
 table = pd.read_html(url)[0]
@@ -115,6 +122,8 @@ fig.add_trace(go.Scatter(
 fig.update_layout(
     title="Elektriciteitsprijs (€/kWh) "+ delivery_date.strftime("%d-%m-%Y"),
     xaxis_title="Tijd")
+
+fig.update_yaxes(title_text="Prijs (€/kWh)")
 fig.update_xaxes(dtick = 2, tickangle = 45)
 
 if min(prices)>0:
@@ -147,12 +156,16 @@ fig.add_trace(go.Scatter(
     x=renewableforecast.index, y=renewableforecast['Solar'],
     stackgroup='one',fillcolor = 'goldenrod', line_color='goldenrod'))
 fig.update_layout(
-    title="Voorspelling zon en wind en totale vraag (MW) "+ delivery_date.strftime("%d-%m-%Y"),
+    title="Voorspelling zon en wind en totale vraag (GW) "+ delivery_date.strftime("%d-%m-%Y"),
     xaxis_title="Tijd")
-fig.update_xaxes(dtick = 2, tickangle = 45)
+
+fig.update_yaxes(title_text="GW")
+fig.update_xaxes(dtick = 8, tickangle = 45)
 fig.update_yaxes(rangemode="tozero")
 
+
 filename = 'forecast_'+delivery_date.strftime('%d%m%Y')+'.png'
+
 
 fig.write_image(filename)
 
@@ -165,7 +178,7 @@ os.remove(filename)
 fig = make_subplots(specs=[[{"secondary_y": True}]])
 fig.add_trace(go.Scatter(
     name="Restlast",
-    mode="lines", x=loadforecast.index, y=loadforecast - renewableforecast.sum(axis = 1) ,
+    mode="lines", x=loadforecast.index, y= restlast,
     line = {"shape":"spline", 'smoothing':1.3}), secondary_y = True)
 fig.add_trace(go.Scatter(
     name="All-in prijs",
@@ -178,16 +191,19 @@ fig.add_trace(go.Scatter(
     line = {"shape":"hv"}))
 '''
 fig.update_layout(
-    title="Elektriciteitsprijs (€/kWh) en restlast (MW) "+ delivery_date.strftime("%d-%m-%Y"),
+    title="Elektriciteitsprijs en restlast "+ delivery_date.strftime("%d-%m-%Y"),
     xaxis_title="Tijd")
 fig.update_xaxes(dtick = 8, tickangle = 45)
 fig.update_yaxes(title_text="Prijs (€/kWh)", secondary_y=False)
-fig.update_yaxes(title_text="Restlast (MW)", secondary_y=True)
+fig.update_yaxes(title_text="Restlast (GW)", secondary_y=True)
+
 
 ##TODO ALIGN Y AXES
 if min(prices)>0 and min(loadforecast - renewableforecast.sum(axis = 1))>0:
-    fig.update_yaxes(rangemode="tozero", secondary_y = True)
-    fig.update_yaxes(rangemode="tozero", secondary_y = False)
+    #bepaal lengte van beide assen
+    tprices = round(max(pricesincl)*1.1,1)
+    trestlast = round(max(restlast)*1.1+0.49,0)
+    fig.update_layout(yaxis = dict(range = [0,tprices], dtick = tprices/10), yaxis2 = dict(range = [0,trestlast],dtick = trestlast/10))
 
 filename = 'residualload_'+delivery_date.strftime('%d%m%Y')+'.png'
 
