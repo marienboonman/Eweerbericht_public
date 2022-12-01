@@ -137,15 +137,15 @@ fig.add_trace(go.Scatter(
 fig.add_trace(go.Scatter(
     name="Wind op zee",
     x=renewableforecast.index, y=renewableforecast['Wind Offshore'],
-    stackgroup='one', fillcolor = 'green'))
+    stackgroup='one', fillcolor = 'aqua', line_color='aqua'))
 fig.add_trace(go.Scatter(
     name="Wind op land",
     x=renewableforecast.index, y=renewableforecast['Wind Onshore'],
-    stackgroup='one',fillcolor = 'blue'))
+    stackgroup='one',fillcolor = 'mediumaquamarine', line_color='mediumaquamarine'))
 fig.add_trace(go.Scatter(
     name="Zon",
     x=renewableforecast.index, y=renewableforecast['Solar'],
-    stackgroup='one',fillcolor = 'yellow'))
+    stackgroup='one',fillcolor = 'goldenrod', line_color='goldenrod'))
 fig.update_layout(
     title="Voorspelling zon en wind en totale vraag (MW) "+ delivery_date.strftime("%d-%m-%Y"),
     xaxis_title="Tijd")
