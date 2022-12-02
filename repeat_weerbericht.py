@@ -1,7 +1,6 @@
 import tweepy
 import keys as tokens
 import sys
-from git import Repo
 import os
 import datetime
 
@@ -85,6 +84,8 @@ if not alreadytweeted:
         f.write(line)
         f.close()
 
+if 'linux' in sys.platform:
+    from git import Repo
     repo = Repo(path)
     repo.index.add('lastcopy.txt')
     repo.index.commit('autocommit tweet {}'.format(str(datetime.date.today())))
