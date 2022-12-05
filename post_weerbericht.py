@@ -109,7 +109,7 @@ strs = []
 for vec, delta in zip([dag, ochtend, middag, avond],[2,2,2,3]):
     time = vec.index[0]
     prijs = round(vec[time],3)
-    strs.append('{}-{}: €{}'.format(time.strftime('%H:%M'),(time+datetime.timedelta(hours=delta)).strftime('%H:%M'),prijs))
+    strs.append('{}-{}: €{}'.format((time+datetime.timedelta(hours=-delta)).strftime('%H:%M'),time.strftime('%H:%M'),prijs))
 
 tweet = "Prijscurve voor morgen!\nDuurste uur:\n{}\nGoedkoopste uur:\n{}\nGoedkoopste aaneengesloten uren:\n\
 hele dag:   {}\n\'s Morgens: {}\n\'s Middags: {}\n\'s Avonds:  {}" \
