@@ -231,6 +231,47 @@ filename = 'residualload_'+delivery_date.strftime('%d%m%Y')+'.png'
 
 fig.write_image(filename)
 
+
+## Figuur met restlast, prijs, forecasts.
+'''
+fig = make_subplots(specs=[[{"secondary_y": True}]])
+fig.add_trace(go.Scatter(
+    name="Totale vraag",
+    mode="lines", x=loadforecast.index, y=loadforecast,
+    line = {"shape":"spline", 'smoothing':1.3}), secondary_y = True)
+fig.add_trace(go.Scatter(
+    name="Wind op zee",
+    x=renewableforecast.index, y=renewableforecast['Wind Offshore'],
+    stackgroup='one', fillcolor = 'aqua', line_color='aqua'), secondary_y = True)
+fig.add_trace(go.Scatter(
+    name="Wind op land",
+    x=renewableforecast.index, y=renewableforecast['Wind Onshore'],
+    stackgroup='one',fillcolor = 'mediumaquamarine', line_color='mediumaquamarine'), secondary_y = True)
+fig.add_trace(go.Scatter(
+    name="Zon",
+    x=renewableforecast.index, y=renewableforecast['Solar'],
+    stackgroup='one',fillcolor = 'goldenrod', line_color='goldenrod'), secondary_y = True)
+fig.update_layout(
+    title="Voorspelling zon en wind en totale vraag (GW) "+ delivery_date.strftime("%d-%m-%Y"),
+    xaxis_title="Tijd")
+fig.add_trace(go.Scatter(
+    name="Restlast",
+    mode="lines", x=loadforecast.index, y= restlast,
+    line = {"shape":"spline", 'smoothing':1.3}), secondary_y = True)
+fig.add_trace(go.Scatter(
+    name="All-in prijs",
+    mode="lines", x=pricesincl.index, y=pricesincl,
+    line = {"shape":"hv"}), secondary_y = False)
+fig.update_xaxes(dtick = 8, tickangle = 45)
+if min(pricesincl)>0 and min(loadforecast)>0:
+    #bepaal lengte van beide assen
+    tprices = round(max(pricesincl)*1.1,1)
+    trestlast = round(max(loadforecast)*1.1+0.49,0)
+    fig.update_layout(yaxis = dict(range = [0,tprices], dtick = tprices/10), yaxis2 = dict(range = [0,trestlast],dtick = trestlast/10))
+
+'''
+
+
 media = api.media_upload(filename)
 imgs.append(media.media_id_string)
 os.remove(filename)
