@@ -82,34 +82,35 @@ goedkoopste = '{}: {}'.format(time,goedkoopsteuur)
 s = pd.Series(index = pricesincl.index, dtype = float)
 
 # 2hr voortschrijdend gemiddelde bepalen
-for i in range(1,len(s.index)):
-  s.iloc[i] = pricesincl.iloc[i-1:i+1].mean()
-
+for i in range(len(s.index)-1):
+  s.iloc[i] = (pricesincl.iloc[i]+pricesincl.iloc[i+1])/2
+'''
 # eerste uur verwijderen, want geen 2hr voortschrijdend gemiddelde
 s = s.drop(s.index[0])
+'''
 
-# goedkoopste intervallen selecteren
-ochtend = s[range(1,8)].sort_values()
-middag = s[range(8,16)].sort_values()
+# goedkoopste intervallen selecteren INDEX = BEGINTIJD
+ochtend = s[range(9)].sort_values()
+middag = s[range(11,17)].sort_values()
 avond =  s[range(17,23)].sort_values()
 
 # lege serie voor 3hr voortschrijdend gemiddelde
-s = pd.Series(index = pricesincl.index, dtype = float)
+s2 = pd.Series(index = pricesincl.index, dtype = float)
 
 # 3hr voortschrijdend gemiddelde bepalen
-for i in range(2,len(s.index)):
-  s.iloc[i] = pricesincl.iloc[i-2:i+1].mean()
-
+for i in range(len(s2.index)-2):
+  s2.iloc[i] = (pricesincl.iloc[i]+pricesincl.iloc[i+1]+pricesincl.iloc[i+2])/3
+'''
 # eerste 2 uur verwijderen want geen 3hr voortschrijdend gemiddelde
 s = s.drop(s.index[0:1])
-
-dag = s.sort_values()
+'''
+dag = s2.sort_values() #index = begintijd
 strs = []
 
-for vec, delta in zip([dag, ochtend, middag, avond],[2,2,2,3]):
+for vec, delta in zip([dag, ochtend, middag, avond],[3,2,2,2]):
     time = vec.index[0]
     prijs = round(vec[time],3)
-    strs.append('{}-{}: €{}'.format((time+datetime.timedelta(hours=-delta)).strftime('%H:%M'),time.strftime('%H:%M'),prijs))
+    strs.append('{}-{}: €{}'.format(time.strftime('%H:%M'),(time+datetime.timedelta(hours=+delta)).strftime('%H:%M'),prijs))
 
 tweet = "Prijscurve voor morgen!\nDuurste uur:\n{}\nGoedkoopste uur:\n{}\nGoedkoopste aaneengesloten uren:\n\
 hele dag:   {}\n\'s Morgens: {}\n\'s Middags: {}\n\'s Avonds:  {}" \
