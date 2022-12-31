@@ -38,7 +38,7 @@ delivery_date = datetime.date.today()+datetime.timedelta(days = 1)
 
 # Day ahead prijzen van de ENTSOE API halen en NL belasting toepassen
 prices = get.prices_api(delivery_date = delivery_date)/1000
-pricesincl = round((prices+0.03679+0.0305)*1.09,4)
+pricesincl = round((prices+0.1525/1.21+0.025)*1.21,4) #2.5 cent terugleververgoeding obv Allinpower
 
 # forecast van hernieuwbare opwek ophalen
 renewableforecast = get.renewable_forecast_api(delivery_date = delivery_date)
@@ -48,7 +48,7 @@ l = get.load_forecast_api(delivery_date = delivery_date)
 loadforecast = pd.Series(index = l.index, dtype = float)
 for i in l.index:
     loadforecast[i] = l.loc[i]
-    
+
 
 loadforecast = loadforecast/1000
 renewableforecast = renewableforecast/1000
