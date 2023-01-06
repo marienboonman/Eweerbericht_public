@@ -32,7 +32,7 @@ if 'linux' in sys.platform:
         print('running from spyder, working folder is {}'.format(os.getcwd()))
 
 
-delivery_date = datetime.date.today()+datetime.timedelta(days = 1)
+delivery_date = datetime.date.today()#+datetime.timedelta(days = 1)
 
 ## DATA OPHALEN
 
@@ -58,12 +58,16 @@ restlast = loadforecast - renewableforecast.sum(axis = 1)
 #prijs van het modelcontract ophalen
 url = 'https://www.overstappen.nl/energie/energietarieven/#Overzicht_energietarieven_2022'
 table = pd.read_html(url)[0]
-table.columns = table.iloc[0]
-table = table.drop(0, axis = 0)
-try:
-    mean = pd.Series(table[table.columns[3]]).str.strip('€').str.replace(',','.').astype(float).mean()
-except:
-    mean = pd.Series(table[table.columns[1]]).str.strip('€').str.replace(',','.').astype(float).mean()
+
+enkeltarieven = []
+for i in table.index:
+    try:
+        tarief = float(table['Enkeltarief'][i].strip('€').replace(',','.'))
+        enkeltarieven.append(tarief)
+    except:
+        print('Tarief NA')    
+
+mean = sum(enkeltarieven)/len(enkeltarieven)
 mean = prices-prices+mean
 
 # sorteren om duurste uur te vinden
