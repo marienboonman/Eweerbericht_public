@@ -32,7 +32,7 @@ if 'linux' in sys.platform:
         print('running from spyder, working folder is {}'.format(os.getcwd()))
 
 
-delivery_date = datetime.date.today()+datetime.timedelta(days = 1)
+delivery_date = datetime.date.today() #+datetime.timedelta(days = 1)
 
 ## DATA OPHALEN
 
