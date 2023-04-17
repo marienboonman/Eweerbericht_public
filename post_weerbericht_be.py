@@ -39,7 +39,7 @@ for land,landnaam in zip (['BE'],['België']):
     
     # Day ahead prijzen van de ENTSOE API halen en NL belasting toepassen
     prices = get.prices_api(country = land,delivery_date = delivery_date)/1000
-    pricesincl = round((prices+0.0389/1.21+0.025)*1.21,4) #2.5 cent terugleververgoeding obv Allinpower
+    pricesincl = round((prices+0.04513)*1.06+0.0020417,4) #2.5 cent terugleververgoeding obv Allinpower
     
     # forecast van hernieuwbare opwek ophalen
     renewableforecast = get.renewable_forecast_api(country = land, delivery_date = delivery_date)
