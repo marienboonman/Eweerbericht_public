@@ -160,7 +160,7 @@ for land,landnaam in zip (['NL'],['Nederland']):
     
     filename = 'prijscurve_'+delivery_date.strftime('%d%m%Y')+'.png'
     
-    fig.write_image(filename)
+    fig.write_image(filename, scale = 2)
     
     media = api.media_upload(filename)
     imgs.append(media.media_id_string)
@@ -196,7 +196,7 @@ for land,landnaam in zip (['NL'],['Nederland']):
     filename = 'figs/forecast_'+delivery_date.strftime('%d%m%Y')+'.png'
     
     
-    fig.write_image(filename)
+    fig.write_image(filename, scale = 2)
     
     media = api.media_upload(filename)
     imgs.append(media.media_id_string)
@@ -236,7 +236,7 @@ for land,landnaam in zip (['NL'],['Nederland']):
     
     filename = 'residualload_'+delivery_date.strftime('%d%m%Y')+'.png'
     
-    fig.write_image(filename)
+    fig.write_image(filename, scale = 2)
     
     
     ## Figuur met restlast, prijs, forecasts.
