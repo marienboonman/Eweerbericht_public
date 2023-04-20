@@ -129,9 +129,9 @@ for land,landnaam in zip (['NL'],['Nederland']):
         s.index = s.index.strftime('%H:%M')
     
     ## START API
-    auth = tweepy.OAuthHandler(tokens.APIKey, tokens.APISecret)
-    auth.set_access_token(tokens.AccessToken, tokens.AccessSecret)
-    api = tweepy.API(auth)
+    #auth = tweepy.OAuthHandler(tokens.APIKey, tokens.APISecret)
+    #auth.set_access_token(tokens.AccessToken, tokens.AccessSecret)
+    #api = tweepy.API(auth)
     imgs = []
     
     # plot prijs, prijsincl en modelcontract
@@ -162,9 +162,9 @@ for land,landnaam in zip (['NL'],['Nederland']):
     
     fig.write_image(filename)
     
-    media = api.media_upload(filename)
+    #media = api.media_upload(filename)
     imgs.append(media.media_id_string)
-    os.remove(filename)
+    #os.remove(filename)
     
     # plot renewable forecast
     fig = go.Figure()
@@ -198,7 +198,7 @@ for land,landnaam in zip (['NL'],['Nederland']):
     
     fig.write_image(filename)
     
-    media = api.media_upload(filename)
+    #media = api.media_upload(filename)
     imgs.append(media.media_id_string)
     #os.remove(filename)
     
@@ -279,9 +279,9 @@ for land,landnaam in zip (['NL'],['Nederland']):
     '''
     
     
-    media = api.media_upload(filename)
+    #media = api.media_upload(filename)
     imgs.append(media.media_id_string)
-    os.remove(filename)
+    #os.remove(filename)
     
     client = tweepy.Client(consumer_key=tokens.APIKey,
                            consumer_secret=tokens.APISecret,
