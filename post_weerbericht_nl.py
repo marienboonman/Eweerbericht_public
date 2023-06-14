@@ -166,8 +166,8 @@ for land,landnaam in zip (['NL'],['Nederland']):
                     showarrow=False,
                     xref='paper',
                     yref='paper',
-                    x=-0.09,
-                    y=-0.11)
+                    x=-0.17,
+                    y=-0.25)
     
     
     if min(prices)>0:
@@ -218,8 +218,8 @@ for land,landnaam in zip (['NL'],['Nederland']):
                     showarrow=False,
                     xref='paper',
                     yref='paper',
-                    x=-0.09,
-                    y=-0.11)
+                    x=-0.17,
+                    y=-0.25)
     
     filename = 'figs/forecast_'+delivery_date.strftime('%d%m%Y')+'.png'
     
@@ -273,8 +273,8 @@ for land,landnaam in zip (['NL'],['Nederland']):
                     showarrow=False,
                     xref='paper',
                     yref='paper',
-                    x=-0.09,
-                    y=-0.11)
+                    x=-0.17,
+                    y=-0.25)
     
     filename = 'residualload_'+delivery_date.strftime('%d%m%Y')+'.png'
     
