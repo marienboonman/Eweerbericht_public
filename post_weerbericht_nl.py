@@ -155,6 +155,21 @@ for land,landnaam in zip (['NL'],['Nederland']):
     fig.update_yaxes(title_text="Prijs (€/kWh)")
     fig.update_xaxes(dtick = 2, tickangle = 45)
     
+    #kleuren
+    fig.update_layout(plot_bgcolor='#FFFFFF')
+    fig.update_layout(paper_bgcolor='rgb(220,230,242)')
+    fig.update_yaxes(showline=True, gridcolor = 'lightgrey')
+    fig.update_layout(title_x = 0.5)
+    #note linksonder
+    fig.add_annotation(text='Eweerbericht/Overstappen.com/ENTSO-E', 
+                    align='left',
+                    showarrow=False,
+                    xref='paper',
+                    yref='paper',
+                    x=-0.09,
+                    y=-0.11)
+    
+    
     if min(prices)>0:
         fig.update_yaxes(rangemode="tozero")
     
@@ -192,6 +207,19 @@ for land,landnaam in zip (['NL'],['Nederland']):
     fig.update_xaxes(dtick = 8, tickangle = 45)
     fig.update_yaxes(rangemode="tozero")
     
+    #kleuren
+    fig.update_layout(plot_bgcolor='#FFFFFF')
+    fig.update_layout(paper_bgcolor='rgb(220,230,242)')
+    fig.update_yaxes(showline=True, gridcolor = 'lightgrey')
+    fig.update_layout(title_x = 0.5)
+    #note linksonder
+    fig.add_annotation(text='Eweerbericht/Overstappen.com/ENTSO-E', 
+                    align='left',
+                    showarrow=False,
+                    xref='paper',
+                    yref='paper',
+                    x=-0.09,
+                    y=-0.11)
     
     filename = 'figs/forecast_'+delivery_date.strftime('%d%m%Y')+'.png'
     
@@ -233,6 +261,20 @@ for land,landnaam in zip (['NL'],['Nederland']):
         tprices = round(max(pricesincl)*1.1,1)
         trestlast = round(max(restlast)*1.1+0.49,0)
         fig.update_layout(yaxis = dict(range = [0,tprices], dtick = tprices/10), yaxis2 = dict(range = [0,trestlast],dtick = trestlast/10))
+    
+    #kleuren
+    fig.update_layout(plot_bgcolor='#FFFFFF')
+    fig.update_layout(paper_bgcolor='rgb(220,230,242)')
+    fig.update_yaxes(showline=True, gridcolor = 'lightgrey')
+    fig.update_layout(title_x = 0.5)
+    #note linksonder
+    fig.add_annotation(text='Eweerbericht/Overstappen.com/ENTSO-E', 
+                    align='left',
+                    showarrow=False,
+                    xref='paper',
+                    yref='paper',
+                    x=-0.09,
+                    y=-0.11)
     
     filename = 'residualload_'+delivery_date.strftime('%d%m%Y')+'.png'
     
