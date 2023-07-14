@@ -42,19 +42,25 @@ for land,landnaam in zip (['NL'],['Nederland']):
     pricesincl = round((prices+0.1525/1.21+0.025)*1.21,4) #2.5 cent terugleververgoeding obv Allinpower
     
     # forecast van hernieuwbare opwek ophalen
-    renewableforecast = get.renewable_forecast_api(country = land, delivery_date = delivery_date)
+    try:
+        renewableforecast = get.renewable_forecast_api(country = land, delivery_date = delivery_date)
+    except:
+        renewableforecast = None
+    try:    
+        # forecast van totale elektriciteitsvraag
+        l = get.load_forecast_api(country = land, delivery_date = delivery_date)
+        loadforecast = pd.Series(index = l.index, dtype = float)
+        for i in l.index:
+            loadforecast[i] = l.loc[i]
+        if land == 'BE':
+            n =1
+    except:
+        loadforecast = None
+                
     
-    # forecast van totale elektriciteitsvraag
-    l = get.load_forecast_api(country = land, delivery_date = delivery_date)
-    loadforecast = pd.Series(index = l.index, dtype = float)
-    for i in l.index:
-        loadforecast[i] = l.loc[i]
-    if land == 'BE':
-        n =1
-    
-    loadforecast = loadforecast/1000
-    renewableforecast = renewableforecast/1000
-    restlast = loadforecast - renewableforecast.sum(axis = 1)
+        loadforecast = loadforecast/1000
+        renewableforecast = renewableforecast/1000
+        restlast = loadforecast - renewableforecast.sum(axis = 1)
     
     
     #prijs van het modelcontract ophalen
@@ -126,7 +132,8 @@ for land,landnaam in zip (['NL'],['Nederland']):
     
     # maak strings van indexen voor plotten
     for s in [prices, pricesincl, renewableforecast, loadforecast]:
-        s.index = s.index.strftime('%H:%M')
+        if not type(s) == type(None):
+            s.index = s.index.strftime('%H:%M')
     
     ## START API
     auth = tweepy.OAuthHandler(tokens.APIKey, tokens.APISecret)
@@ -182,61 +189,65 @@ for land,landnaam in zip (['NL'],['Nederland']):
     os.remove(filename)
     
     # plot renewable forecast
+    
     fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        name="Totale vraag",
-        mode="lines", x=loadforecast.index, y=loadforecast,
-        line = {"shape":"spline", 'smoothing':1.3}))
-    fig.add_trace(go.Scatter(
-        name="Wind op zee",
-        x=renewableforecast.index, y=renewableforecast['Wind Offshore'],
-        stackgroup='one', fillcolor = 'aqua', line_color='aqua'))
-    fig.add_trace(go.Scatter(
-        name="Wind op land",
-        x=renewableforecast.index, y=renewableforecast['Wind Onshore'],
-        stackgroup='one',fillcolor = 'mediumaquamarine', line_color='mediumaquamarine'))
-    fig.add_trace(go.Scatter(
-        name="Zon",
-        x=renewableforecast.index, y=renewableforecast['Solar'],
-        stackgroup='one',fillcolor = 'goldenrod', line_color='goldenrod'))
-    fig.update_layout(
-        title="Voorspelling zon en wind en totale vraag "+landnaam+" (GW) "+ delivery_date.strftime("%d-%m-%Y"),
-        xaxis_title="Tijd")
-    
-    fig.update_yaxes(title_text="GW")
-    fig.update_xaxes(dtick = 8, tickangle = 45)
-    fig.update_yaxes(rangemode="tozero")
-    
-    #kleuren
-    fig.update_layout(plot_bgcolor='#FFFFFF')
-    fig.update_layout(paper_bgcolor='rgb(220,230,242)')
-    fig.update_yaxes(showline=True, gridcolor = 'lightgrey')
-    fig.update_layout(title_x = 0.5)
-    #note linksonder
-    fig.add_annotation(text='Eweerbericht/Overstappen.com/ENTSO-E', 
-                    align='left',
-                    showarrow=False,
-                    xref='paper',
-                    yref='paper',
-                    x=-0.17,
-                    y=-0.25)
-    
-    filename = 'figs/forecast_'+delivery_date.strftime('%d%m%Y')+'.png'
-    
-    
-    fig.write_image(filename, scale = 2)
-    
-    media = api.media_upload(filename)
-    imgs.append(media.media_id_string)
-    #os.remove(filename)
+    if not type(loadforecast) == type(None):
+        fig.add_trace(go.Scatter(
+            name="Totale vraag",
+            mode="lines", x=loadforecast.index, y=loadforecast,
+            line = {"shape":"spline", 'smoothing':1.3}))
+    if not type(renewableforecast) == type(None):
+        fig.add_trace(go.Scatter(
+            name="Wind op zee",
+            x=renewableforecast.index, y=renewableforecast['Wind Offshore'],
+            stackgroup='one', fillcolor = 'aqua', line_color='aqua'))
+        fig.add_trace(go.Scatter(
+            name="Wind op land",
+            x=renewableforecast.index, y=renewableforecast['Wind Onshore'],
+            stackgroup='one',fillcolor = 'mediumaquamarine', line_color='mediumaquamarine'))
+        fig.add_trace(go.Scatter(
+            name="Zon",
+            x=renewableforecast.index, y=renewableforecast['Solar'],
+            stackgroup='one',fillcolor = 'goldenrod', line_color='goldenrod'))
+        fig.update_layout(
+            title="Voorspelling zon en wind en totale vraag "+landnaam+" (GW) "+ delivery_date.strftime("%d-%m-%Y"),
+            xaxis_title="Tijd")
+        
+        fig.update_yaxes(title_text="GW")
+        fig.update_xaxes(dtick = 8, tickangle = 45)
+        fig.update_yaxes(rangemode="tozero")
+        
+        #kleuren
+        fig.update_layout(plot_bgcolor='#FFFFFF')
+        fig.update_layout(paper_bgcolor='rgb(220,230,242)')
+        fig.update_yaxes(showline=True, gridcolor = 'lightgrey')
+        fig.update_layout(title_x = 0.5)
+        #note linksonder
+        fig.add_annotation(text='Eweerbericht/Overstappen.com/ENTSO-E', 
+                        align='left',
+                        showarrow=False,
+                        xref='paper',
+                        yref='paper',
+                        x=-0.17,
+                        y=-0.25)
+        
+        filename = 'figs/forecast_'+delivery_date.strftime('%d%m%Y')+'.png'
+        
+        
+        fig.write_image(filename, scale = 2)
+        
+        media = api.media_upload(filename)
+        imgs.append(media.media_id_string)
+        os.remove(filename)
     
     
     # Create figure with secondary y-axis
     fig = make_subplots(specs=[[{"secondary_y": True}]])
-    fig.add_trace(go.Scatter(
-        name="Restlast",
-        mode="lines", x=loadforecast.index, y= restlast,
-        line = {"shape":"spline", 'smoothing':1.3}), secondary_y = True)
+    if not (type(loadforecast) == type(None) or type(renewableforecast) == type(None)):
+        fig.add_trace(go.Scatter(
+            name="Restlast",
+            mode="lines", x=loadforecast.index, y= restlast,
+            line = {"shape":"spline", 'smoothing':1.3}), secondary_y = True)
     fig.add_trace(go.Scatter(
         name="All-in prijs",
         mode="lines", x=pricesincl.index, y=pricesincl,
