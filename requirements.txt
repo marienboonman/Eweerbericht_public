@@ -1,0 +1,6 @@
+datetime == 5.2
+entsoe-py == 0.5.10
+kaleido == 0.1.0.post1
+pandas == 2.0.3
+plotly == 5.9.0
+tweepy == 4.14.0
