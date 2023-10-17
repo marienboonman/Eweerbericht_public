@@ -208,7 +208,7 @@ for land,landnaam in zip (['NL'],['Nederland']):
             fig.add_trace(go.Scatter(
                 name="Totale vraag",
                 mode="lines", x=loadforecast.index, y=loadforecast,
-                line = {"shape":"spline", 'smoothing':1.3}))
+                line = {'color':'royalblue', "shape":"spline", 'smoothing':1.3}))
         fig.update_layout(
             title="Voorspelling zon en wind en totale vraag "+landnaam+" (GW) "+ delivery_date.strftime("%d-%m-%Y"),
             xaxis_title="Tijd")
