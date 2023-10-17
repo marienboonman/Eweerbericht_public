@@ -191,11 +191,6 @@ for land,landnaam in zip (['NL'],['Nederland']):
     # plot renewable forecast
     
     fig = go.Figure()
-    if not type(loadforecast) == type(None):
-        fig.add_trace(go.Scatter(
-            name="Totale vraag",
-            mode="lines", x=loadforecast.index, y=loadforecast,
-            line = {"shape":"spline", 'smoothing':1.3}))
     if not type(renewableforecast) == type(None):
         fig.add_trace(go.Scatter(
             name="Wind op zee",
@@ -209,6 +204,11 @@ for land,landnaam in zip (['NL'],['Nederland']):
             name="Zon",
             x=renewableforecast.index, y=renewableforecast['Solar'],
             stackgroup='one',fillcolor = 'goldenrod', line_color='goldenrod'))
+        if not type(loadforecast) == type(None):
+            fig.add_trace(go.Scatter(
+                name="Totale vraag",
+                mode="lines", x=loadforecast.index, y=loadforecast,
+                line = {"shape":"spline", 'smoothing':1.3}))
         fig.update_layout(
             title="Voorspelling zon en wind en totale vraag "+landnaam+" (GW) "+ delivery_date.strftime("%d-%m-%Y"),
             xaxis_title="Tijd")
