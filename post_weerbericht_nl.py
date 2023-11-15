@@ -241,56 +241,57 @@ for land,landnaam in zip (['NL'],['Nederland']):
         os.remove(filename)
     
     
-    # Create figure with secondary y-axis
-    fig = make_subplots(specs=[[{"secondary_y": True}]])
-    if not (type(loadforecast) == type(None) or type(renewableforecast) == type(None)):
+    # Figuur met restlast en renewable forecast
+    if type(renewableforecast) is not type(None):
+        fig = make_subplots(specs=[[{"secondary_y": True}]])
+        if not (type(loadforecast) == type(None) or type(renewableforecast) == type(None)):
+            fig.add_trace(go.Scatter(
+                name="Restlast",
+                mode="lines", x=loadforecast.index, y= restlast,
+                line = {"shape":"spline", 'smoothing':1.3}), secondary_y = True)
         fig.add_trace(go.Scatter(
-            name="Restlast",
-            mode="lines", x=loadforecast.index, y= restlast,
-            line = {"shape":"spline", 'smoothing':1.3}), secondary_y = True)
-    fig.add_trace(go.Scatter(
-        name="All-in prijs",
-        mode="lines", x=pricesincl.index, y=pricesincl,
-        line = {"shape":"hv"}), secondary_y = False)
-    '''
-    fig.add_trace(go.Scatter(
-        name="Modelcontract",
-        mode="lines", x=pricesincl.index, y=mean,
-        line = {"shape":"hv"}))
-    '''
-    fig.update_layout(
-        title="Elektriciteitsprijs en restlast "+landnaam+ " "+ delivery_date.strftime("%d-%m-%Y"),
-        xaxis_title="Tijd")
-    fig.update_xaxes(dtick = 8, tickangle = 45)
-    fig.update_yaxes(title_text="Prijs (€/kWh)", secondary_y=False)
-    fig.update_yaxes(title_text="Restlast (GW)", secondary_y=True)
-    
-    
-    ##TODO ALIGN Y AXES
-    '''
-    if min(prices)>0 and min(loadforecast - renewableforecast.sum(axis = 1))>0:
-        #bepaal lengte van beide assen
-        tprices = round(max(pricesincl)*1.1,1)
-        trestlast = round(max(restlast)*1.1+0.49,0)
-        fig.update_layout(yaxis = dict(range = [0,tprices], dtick = tprices/10), yaxis2 = dict(range = [0,trestlast],dtick = trestlast/10))
-    '''
-    #kleuren
-    fig.update_layout(plot_bgcolor='#FFFFFF')
-    fig.update_layout(paper_bgcolor='rgb(220,230,242)')
-    fig.update_yaxes(showline=True, gridcolor = 'lightgrey')
-    fig.update_layout(title_x = 0.5)
-    #note linksonder
-    fig.add_annotation(text='Eweerbericht/Overstappen.com/ENTSO-E', 
-                    align='left',
-                    showarrow=False,
-                    xref='paper',
-                    yref='paper',
-                    x=-0.17,
-                    y=-0.25)
-    
-    filename = 'residualload_'+delivery_date.strftime('%d%m%Y')+'.png'
-    
-    fig.write_image(filename, scale = 2)
+            name="All-in prijs",
+            mode="lines", x=pricesincl.index, y=pricesincl,
+            line = {"shape":"hv"}), secondary_y = False)
+        '''
+        fig.add_trace(go.Scatter(
+            name="Modelcontract",
+            mode="lines", x=pricesincl.index, y=mean,
+            line = {"shape":"hv"}))
+        '''
+        fig.update_layout(
+            title="Elektriciteitsprijs en restlast "+landnaam+ " "+ delivery_date.strftime("%d-%m-%Y"),
+            xaxis_title="Tijd")
+        fig.update_xaxes(dtick = 8, tickangle = 45)
+        fig.update_yaxes(title_text="Prijs (€/kWh)", secondary_y=False)
+        fig.update_yaxes(title_text="Restlast (GW)", secondary_y=True)
+        
+        
+        ##TODO ALIGN Y AXES
+
+        if min(prices)>0 and min(loadforecast - renewableforecast.sum(axis = 1))>0:
+            #bepaal lengte van beide assen
+            tprices = round(max(pricesincl)*1.1,1)
+            trestlast = round(max(restlast)*1.1+0.49,0)
+            fig.update_layout(yaxis = dict(range = [0,tprices], dtick = tprices/10), yaxis2 = dict(range = [0,trestlast],dtick = trestlast/10))
+
+        #kleuren
+        fig.update_layout(plot_bgcolor='#FFFFFF')
+        fig.update_layout(paper_bgcolor='rgb(220,230,242)')
+        fig.update_yaxes(showline=True, gridcolor = 'lightgrey')
+        fig.update_layout(title_x = 0.5)
+        #note linksonder
+        fig.add_annotation(text='Eweerbericht/Overstappen.com/ENTSO-E', 
+                        align='left',
+                        showarrow=False,
+                        xref='paper',
+                        yref='paper',
+                        x=-0.17,
+                        y=-0.25)
+        
+        filename = 'residualload_'+delivery_date.strftime('%d%m%Y')+'.png'
+        
+        fig.write_image(filename, scale = 2)
     
     
     ## Figuur met restlast, prijs, forecasts.
@@ -333,9 +334,9 @@ for land,landnaam in zip (['NL'],['Nederland']):
     '''
     
     
-    media = api.media_upload(filename)
-    imgs.append(media.media_id_string)
-    os.remove(filename)
+        media = api.media_upload(filename)
+        imgs.append(media.media_id_string)
+        os.remove(filename)
     
     client = tweepy.Client(consumer_key=tokens.APIKey,
                            consumer_secret=tokens.APISecret,
