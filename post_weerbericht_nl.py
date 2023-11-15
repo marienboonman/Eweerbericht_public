@@ -292,7 +292,9 @@ for land,landnaam in zip (['NL'],['Nederland']):
         filename = 'residualload_'+delivery_date.strftime('%d%m%Y')+'.png'
         
         fig.write_image(filename, scale = 2)
-    
+        media = api.media_upload(filename)
+        imgs.append(media.media_id_string)
+        os.remove(filename)
     
     ## Figuur met restlast, prijs, forecasts.
     '''
@@ -332,11 +334,7 @@ for land,landnaam in zip (['NL'],['Nederland']):
         fig.update_layout(yaxis = dict(range = [0,tprices], dtick = tprices/10), yaxis2 = dict(range = [0,trestlast],dtick = trestlast/10))
     
     '''
-    
-    
-        media = api.media_upload(filename)
-        imgs.append(media.media_id_string)
-        os.remove(filename)
+
     
     client = tweepy.Client(consumer_key=tokens.APIKey,
                            consumer_secret=tokens.APISecret,
