@@ -267,12 +267,13 @@ for land,landnaam in zip (['NL'],['Nederland']):
     
     
     ##TODO ALIGN Y AXES
+    '''
     if min(prices)>0 and min(loadforecast - renewableforecast.sum(axis = 1))>0:
         #bepaal lengte van beide assen
         tprices = round(max(pricesincl)*1.1,1)
         trestlast = round(max(restlast)*1.1+0.49,0)
         fig.update_layout(yaxis = dict(range = [0,tprices], dtick = tprices/10), yaxis2 = dict(range = [0,trestlast],dtick = trestlast/10))
-    
+    '''
     #kleuren
     fig.update_layout(plot_bgcolor='#FFFFFF')
     fig.update_layout(paper_bgcolor='rgb(220,230,242)')
