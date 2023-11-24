@@ -215,7 +215,7 @@ def plot_forecasts(forecasts, landnaam, delivery_date):
             line = {'color':'royalblue', "shape":"spline", 'smoothing':1.3}))
  
     fig.add_trace(go.Scatter(
-            name="Totale vraag",
+            name="Restlast",
             mode="lines", x=forecasts.index, y=forecasts['Restlast'],
             line = {'color':'crimson', "shape":"spline", 'smoothing':1.3}))
     
