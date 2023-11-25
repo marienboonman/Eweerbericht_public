@@ -11,7 +11,7 @@ import keys as tokens
 #################
 ####INVOERWAARDEN
 ################# 
-energiebelasting = 0.0389
+energiebelasting = 0.04748
 btw = 1.06
 land = 'BE'
 landnaam = 'België'
@@ -62,7 +62,7 @@ forecasts['Load'] = loadforecast
 forecasts['Restlast'] = forecasts['Load'] - renewableforecast.sum(axis = 1)
 forecasts['Prices'] = prices.resample('15T').ffill()
 forecasts['Prices'] = forecasts['Prices'].fillna(method = 'ffill')
-forecasts ['Pricesincl'] = round((forecasts['Prices']+energiebelasting+0.025)*1.21,4)
+forecasts ['Pricesincl'] = round((forecasts['Prices']+energiebelasting+0.025)*btw,4)
 forecasts['Modelcontract'] = modelcontract
 #stringify index
 forecasts.index = forecasts.index.strftime('%H:%M')
