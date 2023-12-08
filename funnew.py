@@ -270,6 +270,19 @@ def plot_loads(forecasts, landnaam, delivery_date):
     
     
     ##TODO ALIGN Y AXES
+    lmax = round(max(forecasts['Restlast']),2)
+    lmin = round(min(forecasts['Restlast']),2)
+    lrange = lmax-lmin
+    lmin = lmin-lrange*0.1
+    lmax = lmax + lrange*0.1
+    
+    pmax = round(max(forecasts['Pricesincl']),2)
+    pmin = round(min(forecasts['Pricesincl']),2)
+    prange = pmax-pmin
+    pmin = pmin-prange*0.1
+    pmax = pmax + prange*0.1
+    
+    fig.update_layout(yaxis = dict(range = [(pmin), pmax], dtick = (prange)/6), yaxis2 = dict(range = [(lmin),lmax], dtick= (lrange)/6))
     '''
     if min(prices)>0 and min(loadforecast - renewableforecast.sum(axis = 1))>0:
         #bepaal lengte van beide assen
