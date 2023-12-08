@@ -47,23 +47,33 @@ delivery_date = datetime.date.today()+datetime.timedelta(days = 1)
 #################
 ####GEGEVENS OPHALEN
 #################
+#Prijzen
 prices = funnew.prices_api(delivery_date = delivery_date)/1000
+modelcontract = funnew.modelcontract(prices)
+forecasts = pd.DataFrame(index = prices.index)
+forecasts['Prices'] = prices.resample('15T').ffill()
+forecasts['Prices'] = forecasts['Prices'].fillna(method = 'ffill')
+forecasts ['Pricesincl'] = round((forecasts['Prices']+energiebelasting+0.025)*1.21,4)
+forecasts['Modelcontract'] = modelcontract
 
-renewableforecast = funnew.renewable_forecast_api(delivery_date = delivery_date)/1000
-loadforecast = funnew.load_forecast_api(delivery_date = delivery_date)/1000
-modelcontract = funnew.modelcontract(renewableforecast)
+try:
+    loadforecast = funnew.load_forecast_api(delivery_date = delivery_date)/1000
+    forecasts['Load'] = loadforecast
+    Load = True
+except:
+    Load = False
 
+
+try:
+    renewableforecast = funnew.renewable_forecast_api(delivery_date = delivery_date)/1000
+    forecasts['Restlast'] = forecasts['Load'] - renewableforecast.sum(axis = 1)
+    RES = True
+except:
+    RES = False    
 
 #################
 ####GEGEVENS BEWERKEN
 #################   
-forecasts = renewableforecast.copy()
-forecasts['Load'] = loadforecast
-forecasts['Restlast'] = forecasts['Load'] - renewableforecast.sum(axis = 1)
-forecasts['Prices'] = prices.resample('15T').ffill()
-forecasts['Prices'] = forecasts['Prices'].fillna(method = 'ffill')
-forecasts ['Pricesincl'] = round((forecasts['Prices']+energiebelasting+0.025)*btw,4)
-forecasts['Modelcontract'] = modelcontract
 #stringify index
 forecasts.index = forecasts.index.strftime('%H:%M')
 
@@ -91,27 +101,28 @@ imgs.append(media.media_id_string)
 os.remove(filename)
 del fig 
 
-### PLOT FORECASTS
-fig = funnew.plot_forecasts(forecasts, landnaam, delivery_date)
-filename = 'forecasts_'+delivery_date.strftime('%d%m%Y')+'.png'
-
-fig.write_image(filename, scale = 2)
-
-media = api.media_upload(filename)
-imgs.append(media.media_id_string)
-os.remove(filename)
-del fig 
-
-###PLOT LASTEN
-fig = funnew.plot_loads(forecasts, 'NL', delivery_date)
-filename = 'loads_'+delivery_date.strftime('%d%m%Y')+'.png'
-
-fig.write_image(filename, scale = 2)
-
-media = api.media_upload(filename)
-imgs.append(media.media_id_string)
-os.remove(filename)
-del fig 
+if (Load and RES):
+    ### PLOT FORECASTS
+    fig = funnew.plot_forecasts(forecasts, landnaam, delivery_date)
+    filename = 'forecasts_'+delivery_date.strftime('%d%m%Y')+'.png'
+    
+    fig.write_image(filename, scale = 2)
+    
+    media = api.media_upload(filename)
+    imgs.append(media.media_id_string)
+    os.remove(filename)
+    del fig 
+    
+    ###PLOT LASTEN
+    fig = funnew.plot_loads(forecasts, 'NL', delivery_date)
+    filename = 'loads_'+delivery_date.strftime('%d%m%Y')+'.png'
+    
+    fig.write_image(filename, scale = 2)
+    
+    media = api.media_upload(filename)
+    imgs.append(media.media_id_string)
+    os.remove(filename)
+    del fig 
 
     
 #################
