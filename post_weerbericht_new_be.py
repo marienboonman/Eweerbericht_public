@@ -4,6 +4,7 @@ import sys
 import datetime
 import tweepy
 import kaleido
+import pandas as pd
 
 import funnew
 import keys as tokens
@@ -49,8 +50,13 @@ delivery_date = datetime.date.today()+datetime.timedelta(days = 1)
 #################
 #Prijzen
 prices = funnew.prices_api(delivery_date = delivery_date)/1000
-modelcontract = funnew.modelcontract(prices)
-forecasts = pd.DataFrame(index = prices.index)
+forecasts = pd.DataFrame(prices.resample('15T').ffill())
+forecasts.columns = ['Prices']
+forecasts.loc[forecasts.index[len(forecasts)-1] + pd.Timedelta(minutes = 15),'Prices'] = forecasts.loc[forecasts.index[len(forecasts)-1],'Prices']
+forecasts.loc[forecasts.index[len(forecasts)-1] + pd.Timedelta(minutes = 15),'Prices'] = forecasts.loc[forecasts.index[len(forecasts)-1],'Prices']
+forecasts.loc[forecasts.index[len(forecasts)-1] + pd.Timedelta(minutes = 15),'Prices'] = forecasts.loc[forecasts.index[len(forecasts)-1],'Prices']
+
+modelcontract = funnew.modelcontract(forecasts)
 forecasts['Prices'] = prices.resample('15T').ffill()
 forecasts['Prices'] = forecasts['Prices'].fillna(method = 'ffill')
 forecasts ['Pricesincl'] = round((forecasts['Prices']+energiebelasting+0.025)*1.21,4)
@@ -66,6 +72,8 @@ except:
 
 try:
     renewableforecast = funnew.renewable_forecast_api(delivery_date = delivery_date)/1000
+    for c in renewableforecast.columns:
+        forecasts[c] = renewableforecast[c]
     forecasts['Restlast'] = forecasts['Load'] - renewableforecast.sum(axis = 1)
     RES = True
 except:

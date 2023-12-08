@@ -147,7 +147,7 @@ def write_tweet(forecasts, land):
         strs.append('{}-{}: €{}'.format(hourfromint(uur),hourfromint(uur+delta),prijs))
     
     tweet = "Prijzen morgen ({})!\nDuurste uur:\n{}\nGoedkoopste uur:\n{}\nGoedkoopste aaneengesloten uren:\n\
-    hele dag:   {}\n\'s Morgens: {}\n\'s Middags: {}\n\'s Avonds:  {}\n\n {}grafiekvandedag" \
+    hele dag: {}\n\'s Morgens: {}\n\'s Middags: {}\n\'s Avonds:  {}\n\n {}grafiekvandedag" \
             .format(land, duurste,goedkoopste,strs[0],strs[1],strs[2],strs[3],"#")
     
     return tweet
