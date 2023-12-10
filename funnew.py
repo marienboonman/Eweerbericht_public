@@ -270,19 +270,46 @@ def plot_loads(forecasts, landnaam, delivery_date):
     
     
     ##TODO ALIGN Y AXES
-    lmax = round(max(forecasts['Restlast']),2)
-    lmin = round(min(forecasts['Restlast']),2)
-    lrange = lmax-lmin
-    lmin = lmin-lrange*0.1
-    lmax = lmax + lrange*0.1
+    lmax = max(forecasts['Restlast'])
+    lmin = min(forecasts['Restlast'])
     
-    pmax = round(max(forecasts['Pricesincl']),2)
-    pmin = round(min(forecasts['Pricesincl']),2)
+    if round(lmax) > lmax:
+        lmax = round(lmax)
+    else:
+        lmax = round(lmax+1)
+    
+    if round(lmin) < lmin:
+        lmin = round(lmin)
+    else:
+        lmin = round(lmin) -1
+
+    loadticks = list(range(lmin,lmax+1))
+    ''' oude methode
+    
+    lmin = round((lmin-lrange*0.1)-0.5)
+    lmax = round((lmax + lrange*0.1)+0.5)
+    '''
+    pmax = max(forecasts['Pricesincl'])
+    pmin = min(forecasts['Pricesincl'])    
     prange = pmax-pmin
     pmin = pmin-prange*0.1
     pmax = pmax + prange*0.1
-    
-    fig.update_layout(yaxis = dict(range = [(pmin), pmax], dtick = (prange)/6), yaxis2 = dict(range = [(lmin),lmax], dtick= (lrange)/6))
+    prange = pmax-pmin
+    pstep = prange*2/len(loadticks)
+    pstep = round(pstep,2)
+    pstep = pstep/2
+    if pmin+pstep*len(loadticks) <pmax:
+        pstep = pstep+0.005
+        
+    t = round(pmin,2)
+    priceticks = [t]
+    while not len(priceticks) == len(loadticks):
+        t = t+pstep
+        priceticks.append(round(t,3))
+    fig.update_layout(yaxis = dict(range = [priceticks[0],priceticks[len(priceticks)-1]],tickvals = priceticks), yaxis2 = dict(range = [loadticks[0], loadticks[len(loadticks)-1]],tickvals= loadticks))
+    fig.update_layout(yaxis = dict(tickvals = priceticks), yaxis2 = dict(tickvals= loadticks))
+
+    #fig.update_layout(yaxis = dict(range = [(pmin), pmax], dtick = (prange)/6), yaxis2 = dict(range = [(lmin),lmax], dtick= (lrange)/6))
     '''
     if min(prices)>0 and min(loadforecast - renewableforecast.sum(axis = 1))>0:
         #bepaal lengte van beide assen
